@@ -12,3 +12,6 @@ data<-read_delim (here("groupproject", "exam_nontidy.txt"))
 
 data %>% 
   distinct()
+
+#
+#
