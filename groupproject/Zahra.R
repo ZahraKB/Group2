@@ -13,7 +13,7 @@ data<-read_delim (here("groupproject", "exam_nontidy.txt"))
 data %>% 
   distinct()
 
-#
+
 #Check variable types comment on any changes you would like to make
 #But do not make any changes 
 glimpse(data)
