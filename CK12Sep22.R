@@ -6,27 +6,26 @@ data<-read_delim (here("groupproject", "exam_nontidy.txt"))
 data <- 
   data %>% 
   rename(ID=subject, 
-         age=`1_Age`) %>% 
+         age=`1_Age`) 
 data <- 
   data %>% 
   rename(volmx=`volume measurement`, 
          value=.value,
          bn=`BN+`,
-         t_stage=`T stage`) %>% 
+         t_stage=`T stage`) 
 
-data<-distinct(data) %>% 
+data<-distinct(data) 
 
 data <- data %>% 
   pivot_wider(names_from = volmx,
-              values_from =value) %>% 
+              values_from =value) 
 
-view(data) %>% 
+view(data) 
 
 data<-
   data %>% 
-  mutate (pvol_binary = if_else (PVol >100, "High", "Low")) %>% 
+  mutate (pvol_binary = if_else (PVol >100, "High", "Low")) 
 
-view(data) 
 
 #A numeric column showing TimeToReccurence in days (or weeks if you like) is missing
 
@@ -34,90 +33,63 @@ view(data)
 #A column showing recurrence as Yes/No
 data<-
   data %>% 
-  mutate(Recurrence=if_else(Recurrence==0, "NO", "Yes")) %>% 
+  mutate(Recurrence=if_else(Recurrence==0, "NO", "Yes")) 
 
 #A numeric column showing multiplication of AnyAdjTherapy and PreopTherapy for each person
 
 data<- 
   data %>% 
-  mutate(PreopAdjTherapy=AnyAdjTherapy*PreopTherapy) %>% 
+  mutate(PreopAdjTherapy=AnyAdjTherapy*PreopTherapy) 
 
+#Create new hospital variable that breaks up 'subject'/Hospital into two variables and extracts the ID. 
+data
+data<-data %>% 
+  separate(col = ID, 
+           into = c("Hospitalname", "id"), 
+           sep = "-")
+data
 
-#creating unique ids in a separate column and hospital in another one
-
-data<-
-  data %>% 
-  rename(Hospital=ID) %>% 
-
-data<-
-  data %>% 
-  mutate(ID=1:n()) %>% 
-
-#ordering the culumns
+#ordering the columns
 
 data<-
   data %>% 
-  select(ID, Hospital, age, everything()) %>% 
+  select(id, Hospitalname, age, everything()) 
 
 #arranging the IDs in increasing order
 data<-
   data %>% 
-  arrange(ID) %>% 
+  arrange(id) 
 
-view(data)
-glimpse (data) %>% 
+data
 
 ##Afterclass code----
 #Read new dataset - exam_joindata.txt
 
 data2 <-read_delim (here("groupproject", "exam_joindata.txt"))
-view(data2) 
+data2
+data
 
-#drop ID variable as it is not needed.
-data<- data %>% 
-  select(-ID) 
-head(data)
-
-#Create new hospital variable that breaks up 'subject'/Hospital into two variables and extracts the ID. 
-data<-data %>% 
-  separate(col = Hospital, 
-           into = c("Hospitalname", "newid"), 
-           sep = "-")
+#creating a numeric variable that converts weeks in timetorecurrence to days
+data<- data %>%
+  mutate(TimeToRecurrence_days=if_else(TimeToRecurrence_unit=="week", (TimeToRecurrence*7), TimeToRecurrence))
 view(data)
-
-#Arrange ID column of your dataset in order of increasing number or alphabetically.
-data<-
-  data %>% 
-  arrange(newid) 
-
-  view(data)
-
-#Read and join the additional dataset to your main dataset.
-view(data2)
-
-#Rename id in original data before merging.
-data<-
-  data %>% rename(id=newid) 
-
-
 
 #change id in orginal data to 'double'(id in the original data and the merge data need to be the same type)
 
-test <-
-  test %>% 
-mutate(id = as.numeric(id)) #This code did not work.
-
+ data<-  data %>%
+mutate(id = as.numeric(id)) 
+  
 #Join new data to original data
-data<- data %>%
+data3<- data %>%
   full_join(data2, by = "id")
 
 #Check for missing values
 #Count the number of missing values per column
-colSums(is.na(data)) 
+colSums(is.na(data3)) 
 #Names the number of columns with missing data. 
-names(which(colSums(is.na(data))>0))
+names(which(colSums(is.na(data3))>0))
 #All the following variables have missing data. 
-#"t_stage", "bGS", "PreopPSA", "TimeToRecurrence", "PVol", "TVol", "pvol_binary" 
+
 
 #Stratify your data by a categorical column and report min, max, mean and sd of a numeric column.
 #Stratify by Recurrence (categorical) and summarizing age (numeric)
@@ -170,4 +142,7 @@ data<-data %>%
             sd(age, na.rm = T)) 
 
 #Use two categorical columns in your dataset to create a table (hint: ?count)
-
+ data3 %>% 
+   count(Recurrence,pvol_binary)
+ #table(data3$Recurrence, data3$pvol_binary)
+ 
