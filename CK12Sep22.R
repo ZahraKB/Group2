@@ -146,3 +146,43 @@ data<-data %>%
    count(Recurrence,pvol_binary)
  #table(data3$Recurrence, data3$pvol_binary)
  
+ ## Day 7 Visialization ----
+install.packages("ggcorrplot")
+library(ggcorrplot)
+ library(tidyverse)
+ library(here)
+ library(patchwork)
+ library(ggplot2)
+ 
+# Does the distribution of PVol depend on sGS?
+ 
+ #Check if the relationship is linear
+ data3 %>% 
+   plot (PVol ~ sGs,  
+ data = data3,
+ main = "correlation between pvol and SGs", 
+ xlab= "sGs",
+ ylab = "PVol")
+ 
+ #Check if there are missing values.
+ cor(data3$sGS, data3$PVol, use = "complete.obs") #Correlation without errors. 
+ #-0.01425058 - shows negative correlation.
+ 
+ #Check overall correlation for some numeric variables.
+ #Scatter plot matrix
+ head (data3)
+ plot(data3, main = "age, RBC.Age.Group, Median.RBC.Age, AA FamHx t_stage")
+ data3
+ 
+ cor(data3, use = "complete.obs")
+ cor(data3, use = "pairwise.complete")
+
+cor(data3$sGS, data3$PVol, use = "pairwise.complete")
+cor(data3$sGS, data3$PVol, use = "complete.obs") #Same correlation so I can use any
+
+ggplot(data = data3, aes(x=PVol, y=sGS)) +geom_point()
+
+#Does the distribution of TVol depend on sGS?
+ggplot(data = data3, aes(x=TVol, y=sGS)) +geom_point()
+
+
