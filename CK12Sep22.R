@@ -1,3 +1,4 @@
+#Day5&6 ----
 library(tidyverse)
 library(here)
 read_delim(here("groupproject", "exam_nontidy.txt"))
@@ -183,6 +184,36 @@ cor(data3$sGS, data3$PVol, use = "complete.obs") #Same correlation so I can use 
 ggplot(data = data3, aes(x=PVol, y=sGS)) +geom_point()
 
 #Does the distribution of TVol depend on sGS?
-ggplot(data = data3, aes(x=TVol, y=sGS)) +geom_point()
+ggplot(data = data3, aes(x=TVol, y=sGS, na.rm =TRUE)) +geom_point()
+
+data3 %>% 
+  ggplot(aes(x = TVol, y = sGS)) +
+  geom_point() + 
+  geom_smooth(method = "lm") 
+
+#Does the distribution of PVol depend on sGS?
+data3 %>% 
+  ggplot(aes(x = PVol, y = sGS)) +
+  geom_point()
 
 
+# Day 8 ----
+#Did having AdjRadTherapy affected time to recurrence?
+#check AnyAdjTherapy = it seems it is a binary variable. 
+
+data %>% count(AnyAdjTherapy)
+
+data3 %>% 
+  ggplot(aes(x = TimeToRecurrence_days, y =AdjRadTherapy)) +
+  geom_boxplot() 
+
+#Plot box plot instead?
+  geom_smooth(method = "lm")
+#Boxplot showing AdjRadtheory vs recurrence
+  Anyadjtherapy_recurrence <-data3 %>%
+    filter(!is.na(TimeToRecurrence_days)) %>%
+    ggplot(data, mapping = aes(x=as.factor(AdjRadTherapy), y=TimeToRecurrence_days))+
+    geom_boxplot(mapping = NULL, stat = "boxplot", position ="dodge2")
+  
+  Anyadjtherapy_recurrence 
+  
