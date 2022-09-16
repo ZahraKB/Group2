@@ -49,8 +49,15 @@ view(data)
     mutate(pvol_binary=if_else(PVol>100, "High", "Low"))
   
   
-    
-    
+  ttr<-
+    data %>% 
+    mutate(TimeToRecurrence_days=if_else(TimeToRecurrence_unit=="week", (TimeToRecurrence*7), TimeToRecurrence))
+
+ 
+  
+
+  
+      
     
   
   
