@@ -17,7 +17,8 @@ data <-
 
 data<-distinct(data)
 
- data %>% 
+ data<-
+data %>% 
   pivot_wider(names_from = volmx,
               values_from =value)
  
@@ -29,9 +30,16 @@ data<-distinct(data)
 
  view(data) 
 
- #A numeric column showing TimeToReccurence in days (or weeks if you like) is missing
+ #A numeric column showing TimeToReccurence in days (or weeks if you like) 
  
+ data<-
+ data %>% 
+   mutate(TimeToRecurrence_days=if_else(TimeToRecurrence_unit=="week", (TimeToRecurrence*7), TimeToRecurrence))
+ View(data)
  
+ data<-
+   data %>% 
+   select(-TimeToRecurrence, -TimeToRecurrence_unit)
  #A column showing recurrence as Yes/No
  data<-
  data %>% 
@@ -54,16 +62,16 @@ data %>%
  data %>% 
    mutate(ID=1:n())
 
- #ordering the culumns
+ #ordering the columns
  
  data<-
    data %>% 
    select(ID, Hospital, age, everything())
 
- #arranging the IDs in increaring order
+ #arranging the IDs in increasing order
  data<-
  data %>% 
    arrange(ID)
  
  
-  
+
