@@ -1,10 +1,11 @@
 
 
 #Does the distribution of PVol depend on sGS?
-data %>% 
-  ggplot(aes(x = PVol, y = sGS)) +
+data3 %>% 
+  ggplot(aes(x = PVol, y = sGS, !is.na())) +
   geom_point()
 
+view(data3)
 
 #Did having AdjRadTherapy affected time to recurrence?
 
