@@ -4,6 +4,7 @@ library(here)
 read_delim(here("groupproject", "exam_nontidy.txt"))
 data<-read_delim (here("groupproject", "exam_nontidy.txt"))
 
+head(data)
 data <- 
   data %>% 
   rename(ID=subject, 
@@ -95,52 +96,55 @@ names(which(colSums(is.na(data3))>0))
 #Stratify your data by a categorical column and report min, max, mean and sd of a numeric column.
 #Stratify by Recurrence (categorical) and summarizing age (numeric)
 
-data <- data %>% 
-  group_by(Recurrence) %>% 
+recurrence_age <- data3 %>% 
+  group_by (Recurrence) %>% 
   summarise(max(age, na.rm = T), 
             min(age, na.rm = T), 
             mean(age, na.rm = T), 
             sd(age, na.rm = T))
-  
+recurrence_age
 
 #Stratify your data by a categorical column and report min, max, mean and sd of a numeric column for a defined set of observations - use pipe!
 ##Only for persons with T.Stage == 1
-data<- data %>% 
+tstagedistribution<- data %>% 
   filter(t_stage ==1) %>% 
   group_by(Recurrence) %>% 
   summarise(max(age, na.rm = T),
             min(age, na.rm = T),
             mean(age, na.rm = T), 
             sd(age, na.rm = T))
+tstagedistribution
 
 #Only for persons with Median.RBC.Age == 25
-data<- data %>% 
-  filter(Median.RBC.Age ==25) %>% 
+medianrbcage <- data %>% 
+  filter (Median.RBC.Age == 25) %>% 
   group_by(Recurrence) %>% 
   summarise(max(age, na.rm = T),
             min(age, na.rm = T),
             mean(age, na.rm = T), 
             sd(age, na.rm = T))
+medianrbcage
 
-# Only for persons with TimeToReccurence later than 4 weeks
-#Did not run code below.
-view(data)
-data<-data %>% 
-  filter(TimeToRecurrence <4) %>% 
+# Only for persons with TimeToReccurence later than 4 days
+timetorecurrence <-data3 %>% 
+  filter(TimeToRecurrence > 4) %>% 
   group_by(Recurrence) %>% 
   summarise(max(age, na.rm = T),
             min(age, na.rm = T),
             mean(age, na.rm = T), 
-            sd(age, na.rm = T)) #Need to change timetorecurrence to weeks
+            sd(age, na.rm = T)) 
+
+timetorecurrence
 
 #Only for persons recruited in Hosp1 and Tvol == 2
- data <- data %>% 
+onlyhosp1_tvol <- data3 %>% 
   filter(Hospitalname == "Hosp1", TVol==2) %>% 
   group_by(Recurrence) %>% 
   summarise(max(age, na.rm = T),
             min(age, na.rm = T),
             mean(age, na.rm = T), 
             sd(age, na.rm = T)) 
+onlyhosp1_tvol
 
 #Use two categorical columns in your dataset to create a table (hint: ?count)
  data3 %>% 
@@ -187,7 +191,7 @@ ggplot(data = data3, aes(x=PVol, y=sGS)) +geom_point()
 ggplot(data = data3, aes(x=TVol, y=sGS, na.rm =TRUE)) +geom_point()
 
 data3 %>% 
-  ggplot(aes(x = TVol, y = sGS)) +
+  ggplot(aes(x = PVol, y = sGS)) +
   geom_point() + 
   geom_smooth(method = "lm") 
 
@@ -217,3 +221,23 @@ data3 %>%
   
   Anyadjtherapy_recurrence 
   
+  
+  
+##Finalcode for plotting
+  #Does the distribution of PVol depend on sGS?
+  data %>% 
+    ggplot(aes(x = PVol, y = sGS)) +
+    geom_point()
+  
+  
+  #Did having AdjRadTherapy affected time to recurrence?
+  #check AnyAdjTherapy = it seems it is a binary variable.
+  
+  
+  #Boxplot showing AdjRadtheory vs recurrence
+  Anyadjtherapy_recurrence <-data %>%
+    filter(!is.na(TimeToRecurrence_days)) %>%
+    ggplot(data, mapping = aes(x=as.factor(AdjRadTherapy), y=TimeToRecurrence_days))+
+    geom_boxplot(mapping = NULL, stat = "boxplot", position ="dodge2")
+  
+  Anyadjtherapy_recurrence 
