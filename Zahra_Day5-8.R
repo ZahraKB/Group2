@@ -75,7 +75,7 @@ data %>%
  
 
 ####Does the distribution of PreopPSA depend on T.Stage?
- #From the plot, it seems that the 
+
  data %>% 
    filter(!is.na(t_stage)) %>% 
  ggplot(data, mapping = aes(x=as.factor(t_stage), y=PreopPSA))+
