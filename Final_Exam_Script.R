@@ -185,30 +185,4 @@ data %>%
   count(Recurrence,pvol_binary)
 
 
-####Does the distribution of PreopPSA depend on T.Stage?
-#From the plot, it seems that the 
-
-data %>% 
-  filter(!is.na(t_stage)) %>% 
-  ggplot(data, mapping = aes(x=as.factor(t_stage), y=PreopPSA))+
-  geom_boxplot(mapping = NULL, stat = "boxplot", position ="dodge2")####Does the distribution of PreopPSA depend on T.Stage?
-#From the plot, it seems that the 
-data<-
-  data %>% 
-  filter(!is.na(t_stage)) %>% 
-  ggplot(data, mapping = aes(x=as.factor(t_stage), y=PreopPSA))+
-  geom_boxplot(mapping = NULL, stat = "boxplot", position ="dodge2")
-
-
-#Data analysis:
-#Was the time to recurrence different for various T.Stage levels?
-#Answer:yes, based on ANOVA and T.Test.
-data %>% 
-  mutate(TimeToRecurrence_days = log(TimeToRecurrence_days)) %>%
-  aov(TimeToRecurrence_days~t_stage, data = .) %>% 
-  broom::tidy()
-
-data %>% 
-  mutate(TimeToRecurrence_days = log(TimeToRecurrence_days)) %>%
-  t.test(TimeToRecurrence_days~t_stage, data = .) %>% 
-  broom::tidy() 
+#### Data analysis and plots will be added by the members
