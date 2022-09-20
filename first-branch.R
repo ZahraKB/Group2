@@ -45,3 +45,20 @@ df %>%
   broom::tidy()
 
 # If significant p-value (p<0.05) -> different TVol for those with recurrence vs without recurrence
+
+
+
+###### DAY 7
+
+### Task 2
+
+ggplot(data = examData, aes(x = "PVol", y = "TVol")) + 
+  geom_point() +
+  geom_smooth(method=lm , color="red", fill="#69b3a2", se=TRUE)
+
+cor_coefs <- cor.test(examData$PVol, examData$TVol)
+
+
+
+
+
