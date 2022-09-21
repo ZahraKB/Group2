@@ -12,7 +12,7 @@ data <-
   data %>% 
   rename(volmx=`volume measurement`, 
          value=.value,
-         bn=`BN+`,
+         age=`1_Age`,
          t_stage=`T stage`)
 
 data<-distinct(data)
@@ -73,5 +73,24 @@ data %>%
  data %>% 
    arrange(ID)
  
- 
 
+####Does the distribution of PreopPSA depend on T.Stage?
+ #From the plot, it seems that the 
+ data %>% 
+   filter(!is.na(t_stage)) %>% 
+ ggplot(data, mapping = aes(x=as.factor(t_stage), y=PreopPSA))+
+   geom_boxplot(mapping = NULL, stat = "boxplot", position ="dodge2")
+ 
+ ###
+ data %>% 
+   mutate(TimeToRecurrence_days = log(TimeToRecurrence_days)) %>%
+   aov(TimeToRecurrence_days~t_stage, data = .) %>% 
+   broom::tidy()
+
+ data %>% 
+   mutate(TimeToRecurrence_days = log(TimeToRecurrence_days)) %>%
+   t.test(TimeToRecurrence_days~t_stage, data = .) %>% 
+   broom::tidy() 
+ 
+ 
+ 
