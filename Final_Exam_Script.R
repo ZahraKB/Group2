@@ -185,4 +185,33 @@ data %>%
   count(Recurrence,pvol_binary)
 
 
-#### Data analysis and plots will be added by the members
+#Plots and data analysis
+
+# plot_Zahra
+
+#Question: Does the distribution of PreopPSA depend on t_Stage?
+#Answer:Answer:t_stage is a set of discrete values, while PreopPSA has continuous values. therefore, geom_boxplot()was used to visualize the data.
+#Based on the plot, it seems that higher t_stage is accompanied by higher distribution of PreopPSA values.
+
+plot1<-
+ data %>% 
+   filter(., !is.na(t_stage)) %>% 
+   ggplot(data, mapping = aes(x=as.factor(t_stage), y=PreopPSA))+
+   geom_boxplot(mapping = NULL, stat = "boxplot", position ="dodge2")
+plot1
+
+
+# Plot_Wafa
+#Deos the distribution of TVol depend on sGS ?
+
+data %>% 
+  filter(!is.na(TVol), !is.na(sGS)) %>% 
+  ggplot(data, mapping = aes(x=as.factor(sGS), y=(TVol)))+
+  geom_count(mapping=NULL, data=NULL, stat = "sum", position="identity", na.rm=TRUE)
+
+
+#Answer: most of the values of TVol are in sGS at level three and much more so than at sGS values of 1 and 4. So there seems to be some correlation between different values of sGs and TVol.
+
+
+
+
