@@ -309,7 +309,9 @@ Answer to the question: since the p value for Anova is higher than
 0.05 it is not possible to reject the null hypothesis and
 and we cannot claim that the time to recurrence varied by RBC age group 
 
+
 ### Analysis Carol
+
 
 
 ### Analysis Taraneh 
