@@ -215,3 +215,40 @@ data %>%
 
 
 
+# Day 8 Analysis 
+
+#Analysis_Zahra 
+
+#Zahra t-test 
+
+#Question: Was the time to recurrence different for various t_Stage levels?
+ 
+  
+ T_test<-
+ data %>% 
+     t.test(TimeToRecurrence_days~t_stage, data = .) %>% 
+   broom::tidy() 
+T_test
+```
+
+#Answer: Since t_stage has 2 categories, I used T.Test to assess the differences between the two categories in terms of the time to recurrence.
+#Based on T.Test, there is a significant difference between various t_stage levels in terms of time to recurrence.
+
+
+# Analysis_Wafa
+
+#Was the time to recurrence different for various RBC.Age.Group levels?
+
+TimetoRecurrencebyRBC_age_group<- data %>% 
+  mutate(TimeToRecurrence_days=log(TimeToRecurrence_days)) %>% 
+  aov(TimeToRecurrence_days~RBC.Age.Group, data=.)
+TimetoRecurrencebyRBC_age_group
+summary(TimetoRecurrencebyRBC_age_group)
+broom::tidy(TimetoRecurrencebyRBC_age_group)
+
+# Answer to the question: since the p value for Anova is higher than 0.05 it is not possible to reject the null hypothesis 
+#and we cannot claim that the time to recurrence varied by RBC age group.
+
+
+
+
