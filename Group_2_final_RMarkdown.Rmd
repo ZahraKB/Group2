@@ -229,8 +229,8 @@ data %>%
 
 ### plot Zahra
 
-*Question:* Does the distribution of PreopPSA depend on t_Stage?
-*Answer:* Answer:t_stage is a set of discrete values, while PreopPSA has continuous values. therefore, geom_boxplot()was used to visualize the data.
+Question: Does the distribution of PreopPSA depend on t_Stage?
+Answer: Answer:t_stage is a set of discrete values, while PreopPSA has continuous values. therefore, geom_boxplot()was used to visualize the data.
 Based on the plot, it seems that higher t_stage is accompanied by higher distribution of PreopPSA values.
 
 ```{r}
