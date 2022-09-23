@@ -260,7 +260,7 @@ cor_coefs
   t.test(TimeToRecurrence_days~t_stage, data = .) %>% 
   broom::tidy() 
 T_test
-```
+
 #Answer: Since t_stage has 2 categories, I used T.Test to assess the differences between the two categories in terms of the time to recurrence.
 #Based on T.Test, there is a significant difference between various t_stage levels in terms of time to recurrence. The p value was 0.0115 which is < 0.05, so it is possible to possible to reject the null hypothesis.
 
