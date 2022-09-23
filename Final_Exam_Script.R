@@ -185,30 +185,149 @@ data %>%
   count(Recurrence,pvol_binary)
 
 
-####Does the distribution of PreopPSA depend on T.Stage?
-#From the plot, it seems that the 
+#Plots and data analysis
+
+# plot_Zahra
+
+#Question: Does the distribution of PreopPSA depend on t_Stage?
+#Answer:Answer:t_stage is a set of discrete values, while PreopPSA has continuous values. therefore, geom_boxplot()was used to visualize the data.
+#Based on the plot, it seems that higher t_stage is accompanied by higher distribution of PreopPSA values.
+
+plot1<-
+ data %>% 
+   filter(., !is.na(t_stage)) %>% 
+   ggplot(data, mapping = aes(x=as.factor(t_stage), y=PreopPSA))+
+   geom_boxplot(mapping = NULL, stat = "boxplot", position ="dodge2")
+plot1
+
+
+# Plot_Wafa
+#Deos the distribution of TVol depend on sGS ?
 
 data %>% 
-  filter(!is.na(t_stage)) %>% 
-  ggplot(data, mapping = aes(x=as.factor(t_stage), y=PreopPSA))+
-  geom_boxplot(mapping = NULL, stat = "boxplot", position ="dodge2")####Does the distribution of PreopPSA depend on T.Stage?
-#From the plot, it seems that the 
-data<-
-  data %>% 
-  filter(!is.na(t_stage)) %>% 
-  ggplot(data, mapping = aes(x=as.factor(t_stage), y=PreopPSA))+
+  filter(!is.na(TVol), !is.na(sGS)) %>% 
+  ggplot(data, mapping = aes(x=as.factor(sGS), y=(TVol)))+
+  geom_count(mapping=NULL, data=NULL, stat = "sum", position="identity", na.rm=TRUE)
+
+
+#Answer: most of the values of TVol are in sGS at level three and much more so than at sGS values of 1 and 4. So there seems to be some correlation between different values of sGs and TVol.
+
+# Plot_Carol
+#Does the distribution of PVol depend on sGS?*
+
+#It seems that the distribution of PVol depends on the level SGS.Those in category 2 have the highest PVol mean*
+
+ 
+data %>%
+
+  filter(!is.na(sGS)) %>%
+
+  ggplot(data, mapping = aes(x=as.factor(sGS), y=PVol))+
+
   geom_boxplot(mapping = NULL, stat = "boxplot", position ="dodge2")
 
 
-#Data analysis:
-#Was the time to recurrence different for various T.Stage levels?
-#Answer:yes, based on ANOVA and T.Test.
-data %>% 
-  mutate(TimeToRecurrence_days = log(TimeToRecurrence_days)) %>%
-  aov(TimeToRecurrence_days~t_stage, data = .) %>% 
-  broom::tidy()
 
-data %>% 
+# Plot Taraneh
+# Is there a relation between the PVol and TVol variables?
+
+library(hrbrthemes)
+# Scatter plot with linear trend
+ggplot(data, aes(x=PVol, y=TVol)) +
+  geom_point() +
+  geom_smooth(method=lm , color="red", se=FALSE) +
+  theme_ipsum()
+
+# Correlation test
+
+cor_coefs <- cor.test(data$PVol, data$TVol)
+cor_coefs
+# p-value=0.0002217 < 0.05 --> we can conclude that PVol and TVol are significantly correlated with correlation coefficient = -0.21
+
+
+# Day 8 Analysis 
+
+#Analysis_Zahra 
+
+#Zahra t-test 
+
+#Question: Was the time to recurrence different for various t_Stage levels?
+ 
+  
+ T_test<-
+ data %>% 
   mutate(TimeToRecurrence_days = log(TimeToRecurrence_days)) %>%
   t.test(TimeToRecurrence_days~t_stage, data = .) %>% 
   broom::tidy() 
+T_test
+```
+#Answer: Since t_stage has 2 categories, I used T.Test to assess the differences between the two categories in terms of the time to recurrence.
+#Based on T.Test, there is a significant difference between various t_stage levels in terms of time to recurrence. The p value was 0.0115 which is < 0.05, so it is possible to possible to reject the null hypothesis.
+
+
+# Analysis_Wafa
+
+#Was the time to recurrence different for various RBC.Age.Group levels?
+
+TimetoRecurrencebyRBC_age_group<- data %>% 
+  mutate(TimeToRecurrence_days=log(TimeToRecurrence_days)) %>% 
+  aov(TimeToRecurrence_days~RBC.Age.Group, data=.)
+TimetoRecurrencebyRBC_age_group
+summary(TimetoRecurrencebyRBC_age_group)
+broom::tidy(TimetoRecurrencebyRBC_age_group)
+
+# Answer to the question: since the p value for Anova is higher than 0.05 it is not possible to reject the null hypothesis 
+#and we cannot claim that the time to recurrence varied by RBC age group.
+
+# Analysis_Carol
+#Did having AdjRadTherapy affected time to recurrence?
+#Boxplot showing AdjRadtheory vs recurrence
+#Results: This relationship is unclear because the there are very few 1's in the anyadjtherapy recurrence.
+#However the mean is higher in those with 0's
+#The p value value is 0.592.
+
+Anyadjtherapy_recurrence <-data %>%
+
+  filter(!is.na(TimeToRecurrence_days)) %>%
+
+  ggplot(data, mapping = aes(x=as.factor(AdjRadTherapy), y=TimeToRecurrence_days))+
+
+  geom_boxplot(mapping = NULL, stat = "boxplot", position ="dodge2")
+
+Anyadjtherapy_recurrence
+
+ 
+ data %>%
+
+  mutate(TimeToRecurrence_days = log(TimeToRecurrence_days)) %>%
+
+  aov(TimeToRecurrence_days~AdjRadTherapy, data = .) %>%
+
+  broom::tidy()
+
+# Analysis_Taraneh
+Did those that had recurrence had also larger TVol values than those without recurrence?
+
+# Here we see at TVol for those with (1) and without recurrence (0):
+
+# First we need to load the required packages:
+library(tidyverse)
+library(medicaldata)
+library(ggpubr)
+library(rstatix)
+
+# Before performing any statistical test, we need to find out whether if the variables are normally distributed or not:
+
+data %>%
+  group_by(Recurrence) %>%
+  shapiro_test(TVol)
+
+# Output p-value << 0.05 --> We cannot assume the normality, so we need to use non-parametric test (Kruskalwallis):
+
+data %>%
+  kruskal.test(TVol~Recurrence, data = .) %>%
+  broom::tidy()
+
+# Output p-value = 0.000000367 << 0.05, i.e. we have a significant p-value. It is possible to reject the null hypothesis. Thus, we can claim that the TVol is different for those with recurrence vs without recurrence.
+
+

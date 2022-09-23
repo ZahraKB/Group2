@@ -1,7 +1,4 @@
 # Group2
-Wafa_note: Access to read_me. First changes to share. 
-taranehj: trying to create my own branch 
-Carol:testing...
-## Wafa_2: making changes from RStudio
-## new comment 
-### another one!!!
+# The Final_Exam_Script indicates all the codes we wrote and performed during the course period.
+# The Group_2_final_RMarkdown combines all the reports from group members based on their individual tasks.
+# the data files can be found in the "groupproject" folder.
