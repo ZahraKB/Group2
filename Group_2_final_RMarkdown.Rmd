@@ -10,13 +10,13 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-###Description of data set:
+### Description of data set:
 Source: This data set is mainly from Cata et al. ’Blood Storage Duration and Biochemical Recurrence of Cancer after Radical Prostate- ctomy’. Mayo Clin Proc 2011; 86(2): 120-127. This data set contains data on 316 men who had undergone radical prostatectomy and received transfusion during or within 30 days of the surgical procedure and had available prostate serum antigen (PSA) follow-up data. The main exposure of interest was RBC storage duration group.
 The dataset has been transformed by the teachers so that it is not in the tidy format anymore.In other words, the txt-file _exam_nontidy.txt_ contains a large dataset of many variables and a large number of observations. 
 
 
 
-####***Day5: Exploring data.
+#### ***Day5: Exploring data.
 We used glimpse function to check if any column starts with a number or has any spaces. Also it was possible to check the first and last few columns. We also inspected the dataset to check if there are any columns contained combined variables, which need to be in separate columns. In additipn,we checked if there are any missing values.
 
 ```{r}
