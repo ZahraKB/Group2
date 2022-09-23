@@ -1,0 +1,394 @@
+---
+title: "Group_2_RMED901-R"
+author: "Group 2 members"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+###Description of data set:
+Source: This data set is mainly from Cata et al. ’Blood Storage Duration and Biochemical Recurrence of Cancer after Radical Prostate- ctomy’. Mayo Clin Proc 2011; 86(2): 120-127. This data set contains data on 316 men who had undergone radical prostatectomy and received transfusion during or within 30 days of the surgical procedure and had available prostate serum antigen (PSA) follow-up data. The main exposure of interest was RBC storage duration group.
+The dataset has been transformed by the teachers so that it is not in the tidy format anymore.In other words, the txt-file _exam_nontidy.txt_ contains a large dataset of many variables and a large number of observations. 
+
+
+
+####***Day5: Exploring data.
+We used glimpse function to check if any column starts with a number or has any spaces. Also it was possible to check the first and last few columns. We also inspected the dataset to check if there are any columns contained combined variables, which need to be in separate columns. In additipn,we checked if there are any missing values.
+
+```{r}
+library(tidyverse)
+library(here)
+
+data<-read_delim (here("groupproject", "exam_nontidy.txt"))
+
+glimpse(data)
+head(data)
+tail(data)
+
+naniar::gg_miss_var(data)
+
+  colSums(is.na(data))
+```
+
+
+#### ***Day6:Tidy, adjust, and explore data***
+After exploring the dataset, we removed the duplicates as well as unnecessary columns according to the points mentioned in the exam description. In addition, we made necessary changes in variable types. we wrote a code that breaks up 'subject' column into two variables Hospitalname (chategirical) and id (numeric).Subsequently, we renamed some columns that had long names, space between characters, or started with a number.
+
+```{r, message=FALSE}
+
+data<-
+data %>% 
+  distinct() %>% 
+
+  select(-AA, -bGS, -`BN+`,-OrganConfined) %>% 
+
+
+  rename(volmx=`volume measurement`, 
+         value=.value,
+         age=`1_Age`,
+         t_stage=`T stage`) %>% 
+
+
+  separate(col = subject, 
+           into = c("Hospitalname", "id"), 
+           sep = "-")
+```
+
+#### ***Creating a new set of columns***
+
+According to the exam description, we created a column showing whether PVol is higher than 100 or not. First, we made separate columns for PVol and TVol. Then, we created a new column called "PVol-binary" that shows values as high and low, depending on whether they are higher than 100 or not. The new column shows values as High/Low.
+
+In the next step, we created a numeric column showing TimeToReccurence as days. Then, we removed the old TimeToRecurrence columns since they are now unnecessary.
+Additionally, we created a column showing the Recurrence as Yes/No. Finally, we added a numeric column showing multiplication of AnyAdjTherapy and PreopTherapy for each person.
+    
+
+```{r, message=FALSE}
+
+data<-
+data %>% 
+  pivot_wider(names_from = volmx,
+              values_from =value) %>% 
+
+
+  mutate(pvol_binary=if_else(PVol>100, "High", "Low")) %>% 
+
+
+  mutate(TimeToRecurrence_days=if_else(TimeToRecurrence_unit=="week", (TimeToRecurrence*7), TimeToRecurrence)) %>% 
+
+
+  select(-TimeToRecurrence, -TimeToRecurrence_unit) %>% 
+  
+ 
+      mutate(Recurrence=if_else(Recurrence==0, "NO", "Yes")) %>% 
+  
+  
+  
+   mutate(PreopAdjTherapy=AnyAdjTherapy*PreopTherapy)
+  
+```
+
+
+
+# Tidying data
+
+```{r}
+#Set the order of columns as: id, hospital, Age and other columns
+data<- data %>% 
+  select(id, Hospitalname, age, everything())
+```
+
+Arrange ID column of your dataset in order of increasing number or alphabetically.
+
+```{r}
+
+ data<-
+   data %>% 
+   arrange(id)
+
+```
+Read and join the additional dataset to your main dataset.
+change id in orginal data to 'double'(id in the original data and the merge data need to be the same type)
+Reading the second dataset and calling it data2
+Join new data to original data
+
+```{r join the two datasets}
+
+  data<-  
+    data %>%
+      mutate(id = as.numeric(id))
+
+  data2<-
+  read_delim(here("groupproject", "exam_joindata.txt"))
+  
+  data<- 
+    data %>%
+        full_join(data2, by = "id")
+
+```
+
+Exploring the data, checking the number of missing values in each columns
+```{r}
+ 
+
+colSums(is.na(data))
+naniar::gg_miss_var(data)
+names(which(colSums(is.na(data))>0))
+
+```
+Answer: most of the missing values are in the second data set in SGs values. 116 values for sGS are missing. Whereas in the initial dataset there are some missing values are in t_stage, PVol and TVol but these are quite small in number. 
+
+##Stratify your data by a categorical column and report min, max, mean and sd of a numeric column.
+
+Stratify by Recurrence (categorical) and summarizing age (numeric)
+
+```{r}
+
+recurrence_age <- data %>%
+    group_by(Recurrence) %>%
+    summarise(max(age, na.rm = T),
+      min(age, na.rm = T),
+      mean(age, na.rm = T),
+       sd(age, na.rm = T))
+recurrence_age
+
+```
+
+
+##Stratify your data by a categorical column and report min, max, mean and sd of a numeric column for a defined set of observations - use pipe!
+
+Only for persons with T.Stage == 1
+
+```{r}
+recurrence_t_stage<- data %>%
+  filter(t_stage ==1) %>%
+  group_by(Recurrence) %>%
+  summarise(max(age, na.rm = T),
+            min(age, na.rm = T),
+            mean(age, na.rm = T),
+            sd(age, na.rm = T))
+
+recurrence_t_stage
+
+```
+
+Only for persons with Median.RBC.Age == 25
+
+```{r}
+
+Median.RBC_recurrence<- data %>%
+  
+  filter(Median.RBC.Age ==25) %>%
+  group_by(Recurrence) %>%
+  summarise(max(age, na.rm = T),
+            min(age, na.rm = T),
+            mean(age, na.rm = T),
+            sd(age, na.rm = T))
+
+Median.RBC_recurrence
+```
+
+Only for persons with TimeToReccurence later than 4 days
+
+```{r}
+day4_recurrence<-data %>%
+  filter(TimeToRecurrence_days >4) %>%
+  group_by(Recurrence) %>% 
+  summarise(max(age, na.rm = T),
+            min(age, na.rm = T),
+            mean(age, na.rm = T),
+            sd(age, na.rm = T))
+
+day4_recurrence
+
+```
+
+Only for persons recruited in Hosp1 and Tvol == 2
+```{r}
+recurrence_hospital_TVol <- data %>%
+  filter(Hospitalname == "Hosp1", TVol==2) %>%
+  group_by(Recurrence) %>%
+  summarise(max(age, na.rm = T),
+            min(age, na.rm = T),
+            mean(age, na.rm = T),
+            sd(age, na.rm = T))
+recurrence_hospital_TVol
+```
+
+
+Use two categorical columns in your dataset to create a table (hint: ?count)
+```{r}
+data %>%
+  count(Recurrence,pvol_binary)
+```
+
+
+
+### plot Zahra
+
+*Question:* Does the distribution of PreopPSA depend on t_Stage?
+*Answer:* Answer:t_stage is a set of discrete values, while PreopPSA has continuous values. therefore, geom_boxplot()was used to visualize the data.
+Based on the plot, it seems that higher t_stage is accompanied by higher distribution of PreopPSA values.
+
+```{r}
+plot1<-
+ data %>% 
+   filter(., !is.na(t_stage)) %>% 
+   ggplot(data, mapping = aes(x=as.factor(t_stage), y=PreopPSA))+
+   geom_boxplot(mapping = NULL, stat = "boxplot", position ="dodge2")
+plot1
+
+```
+
+
+### Plot_Wafa
+Deos the distribution of TVol depend on sGS ?
+```{r, echo=FALSE}
+data %>% 
+  filter(!is.na(TVol), !is.na(sGS)) %>% 
+  ggplot(data, mapping = aes(x=as.factor(sGS), y=(TVol)))+
+  geom_count(mapping=NULL, data=NULL, stat = "sum", position="identity", na.rm=TRUE)
+```
+
+Answer: most of the values of TVol are in sGS at level three and much 
+more so than at sGS values of 1 and 4. So there seems to be some correlation between different values of sGs and TVol. 
+ 
+### plot Carol 
+
+Does the distribution of PVol depend on sGS?*
+```{r}
+data %>% 
+  filter(!is.na(sGS)) %>% 
+  ggplot(data, mapping = aes(x=as.factor(sGS), y=PVol))+
+  geom_boxplot(mapping = NULL, stat = "boxplot", position ="dodge2")
+```
+
+It seems that the distribution of PVol depends on the level SGS.Those in category 2 have the highest PVol mean*
+
+### plot Taraneh 
+
+Is there a relation between the PVol and TVol variables?
+
+```{r}
+
+
+library(ggplot2) 
+library(hrbrthemes)
+
+#Scatter plot with linear trend 
+
+ggplot(data, aes(x=PVol, y=TVol)) + 
+  geom_point() +
+  geom_smooth(method=lm , color="red", se=FALSE) +
+  theme_ipsum()
+
+# Correlation test
+
+cor_coefs <- cor.test(data$PVol, data$TVol)
+cor_coefs
+```
+
+ Answer: p-value=0.0002217 < 0.05 --> we can conclude that PVol and TVol are significantly correlated with correlation coefficient = -0.21
+
+ 
+ 
+## Day 8 Analysis 
+
+### Analysis Zahra 
+
+Zahra t-test 
+
+*Question:* Was the time to recurrence different for various t_Stage levels?
+ 
+```{r}
+  
+  
+ T_test<-
+ data %>% 
+  mutate(TimeToRecurrence_days = log(TimeToRecurrence_days)) %>%
+  t.test(TimeToRecurrence_days~t_stage, data = .) %>% 
+  broom::tidy() 
+T_test
+
+```
+
+Answer: Since t_stage has 2 categories, I used T.Test to assess the differences between the two categories in terms of the time to recurrence.
+Based on T.Test, there is a significant difference between various t_stage levels in terms of time to recurrence.The p value was 0.0115 which is < 0.05, so it is possible to possible to reject the null hypothesis.
+
+### Analysis_Wafa
+
+Was the time to recurrence different for various RBC.Age.Group levels?
+
+```{r}
+
+TimetoRecurrencebyRBC_age_group<- data %>% 
+  mutate(TimeToRecurrence_days=log(TimeToRecurrence_days)) %>% 
+  aov(TimeToRecurrence_days~RBC.Age.Group, data=.)
+TimetoRecurrencebyRBC_age_group
+summary(TimetoRecurrencebyRBC_age_group)
+broom::tidy(TimetoRecurrencebyRBC_age_group)
+```
+ 
+Answer to the question: since the p value for Anova is higher than 
+0.05 it is not possible to reject the null hypothesis and
+and we cannot claim that the time to recurrence varied by RBC age group 
+
+
+### Analysis Carol
+Did having AdjRadTherapy affected time to recurrence?
+
+```{r}
+Anyadjtherapy_recurrence <-data %>%
+  filter(!is.na(TimeToRecurrence_days)) %>%
+  ggplot(data, mapping = aes(x=as.factor(AdjRadTherapy), y=TimeToRecurrence_days))+
+  geom_boxplot(mapping = NULL, stat = "boxplot", position ="dodge2")
+
+Anyadjtherapy_recurrence 
+
+data %>% 
+  mutate(TimeToRecurrence_days = log(TimeToRecurrence_days)) %>%
+  aov(TimeToRecurrence_days~AdjRadTherapy, data = .) %>% 
+  broom::tidy()
+
+```
+
+
+Boxplot showing AdjRadtheory vs recurrence
+Results: This relationship is unclear because the there are very few 1's in the anyadjtherapy recurrence.
+However the mean is higher in those with 0's
+The p value value is 0.592.
+
+### Analysis Taraneh
+
+Did those that had recurrence had also larger TVol values than those without recurrence?
+Here we see at TVol for those with (1) and without recurrence (0):
+
+```{r}
+# First we need to load the required packages: 
+library(tidyverse)
+library(medicaldata)
+library(ggpubr)
+library(rstatix)
+
+# Before performing any statistical test, we need to find out whether if the variables are normally distributed or not: 
+
+data %>%
+  group_by(Recurrence) %>%
+  shapiro_test(TVol)
+
+# Output p-value << 0.05 --> We cannot assume the normality, so we need to use non-parametric test (Kruskalwallis): 
+
+data %>% 
+  kruskal.test(TVol~Recurrence, data = .) %>%
+  broom::tidy()
+```
+
+
+Answer: Output p-value = 0.000000367 << 0.05, i.e. we have a significant p-value. It is possible to reject the null hypothesis. Thus, we can claim that the TVol is different for those with recurrence vs without recurrence.
+
+
+
+
