@@ -16,7 +16,7 @@ The dataset has been transformed by the teachers so that it is not in the tidy f
 
 
 
-#### ***Day5: Exploring data.
+#### Day5: Exploring data
 We used glimpse function to check if any column starts with a number or has any spaces. Also it was possible to check the first and last few columns. We also inspected the dataset to check if there are any columns contained combined variables, which need to be in separate columns. In additipn,we checked if there are any missing values.
 
 ```{r}
@@ -35,7 +35,7 @@ naniar::gg_miss_var(data)
 ```
 
 
-#### ***Day6:Tidy, adjust, and explore data***
+#### Day6:Tidy, adjust, and explore data
 After exploring the dataset, we removed the duplicates as well as unnecessary columns according to the points mentioned in the exam description. In addition, we made necessary changes in variable types. we wrote a code that breaks up 'subject' column into two variables Hospitalname (chategirical) and id (numeric).Subsequently, we renamed some columns that had long names, space between characters, or started with a number.
 
 ```{r, message=FALSE}
@@ -58,7 +58,7 @@ data %>%
            sep = "-")
 ```
 
-#### ***Creating a new set of columns***
+##### Creating a new set of columns
 
 According to the exam description, we created a column showing whether PVol is higher than 100 or not. First, we made separate columns for PVol and TVol. Then, we created a new column called "PVol-binary" that shows values as high and low, depending on whether they are higher than 100 or not. The new column shows values as High/Low.
 
@@ -93,10 +93,10 @@ data %>%
 
 
 
-# Tidying data
+##### Tidying data
 
 ```{r}
-#Set the order of columns as: id, hospital, Age and other columns
+Set the order of columns as: id, hospital, Age and other columns
 data<- data %>% 
   select(id, Hospitalname, age, everything())
 ```
@@ -110,7 +110,7 @@ Arrange ID column of your dataset in order of increasing number or alphabeticall
    arrange(id)
 
 ```
-Read and join the additional dataset to your main dataset.
+##### Read and join the additional dataset to your main dataset.
 change id in orginal data to 'double'(id in the original data and the merge data need to be the same type)
 Reading the second dataset and calling it data2
 Join new data to original data
@@ -141,7 +141,7 @@ names(which(colSums(is.na(data))>0))
 ```
 Answer: most of the missing values are in the second data set in SGs values. 116 values for sGS are missing. Whereas in the initial dataset there are some missing values are in t_stage, PVol and TVol but these are quite small in number. 
 
-##Stratify your data by a categorical column and report min, max, mean and sd of a numeric column.
+##### Stratifying data by a categorical column and reporting min, max, mean and sd of a numeric column.
 
 Stratify by Recurrence (categorical) and summarizing age (numeric)
 
@@ -158,7 +158,7 @@ recurrence_age
 ```
 
 
-##Stratify your data by a categorical column and report min, max, mean and sd of a numeric column for a defined set of observations - use pipe!
+##### Stratifying data by a categorical column and reporting min, max, mean and sd of a numeric column for a defined set of observations - using pipe.
 
 Only for persons with T.Stage == 1
 
@@ -225,9 +225,9 @@ data %>%
   count(Recurrence,pvol_binary)
 ```
 
+#### Day7: Creating Plots
 
-
-### plot Zahra
+##### plot by Zahra
 
 Question: Does the distribution of PreopPSA depend on t_Stage?
 Answer: Answer:t_stage is a set of discrete values, while PreopPSA has continuous values. therefore, geom_boxplot()was used to visualize the data.
@@ -244,7 +244,7 @@ plot1
 ```
 
 
-### Plot_Wafa
+##### plot by Wafa
 Deos the distribution of TVol depend on sGS ?
 ```{r, echo=FALSE}
 data %>% 
@@ -256,7 +256,7 @@ data %>%
 Answer: most of the values of TVol are in sGS at level three and much 
 more so than at sGS values of 1 and 4. So there seems to be some correlation between different values of sGs and TVol. 
  
-### plot Carol 
+##### plot by Carol 
 
 Does the distribution of PVol depend on sGS?*
 ```{r}
@@ -268,7 +268,7 @@ data %>%
 
 It seems that the distribution of PVol depends on the level SGS.Those in category 2 have the highest PVol mean*
 
-### plot Taraneh 
+##### plot by Taraneh 
 
 Is there a relation between the PVol and TVol variables?
 
@@ -295,11 +295,11 @@ cor_coefs
 
  
  
-## Day 8 Analysis 
+#### Day8: Data Analysis 
 
-### Analysis Zahra 
+##### Analysis by Zahra 
 
-*Question:* Was the time to recurrence different for various t_Stage levels?
+Question: Was the time to recurrence different for various t_Stage levels?
  
 ```{r}
    
@@ -314,7 +314,7 @@ T_test
 Answer: Since t_stage has 2 categories, I used T.Test to assess the differences between the two categories in terms of the time to recurrence.
 Based on T.Test, there is a significant difference between various t_stage levels in terms of time to recurrence.The p value was 0.0115 which is < 0.05, so it is possible to possible to reject the null hypothesis.
 
-### Analysis_Wafa
+##### Analysis by Wafa
 
 Was the time to recurrence different for various RBC.Age.Group levels?
 
@@ -333,7 +333,7 @@ Answer to the question: since the p value for Anova is higher than
 and we cannot claim that the time to recurrence varied by RBC age group 
 
 
-### Analysis Carol
+##### Analysis by Carol
 Did having AdjRadTherapy affected time to recurrence?
 
 ```{r}
@@ -357,7 +357,7 @@ Results: This relationship is unclear because the there are very few 1's in the 
 However the mean is higher in those with 0's
 The p value value is 0.592.
 
-### Analysis Taraneh
+##### Analysis by Taraneh
 
 Did those that had recurrence had also larger TVol values than those without recurrence?
 Here we see at TVol for those with (1) and without recurrence (0):
