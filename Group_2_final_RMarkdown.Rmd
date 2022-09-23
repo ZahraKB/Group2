@@ -256,17 +256,43 @@ data %>%
 Answer: most of the values of TVol are in sGS at level three and much 
 more so than at sGS values of 1 and 4. So there seems to be some correlation between different values of sGs and TVol. 
  
-### plot taraneh 
+### plot Carol 
 
+Does the distribution of PVol depend on sGS?*
 ```{r}
-ggplot(data = data, aes(x = "PVol", y = "TVol")) + 
-  geom_point() +
-  geom_smooth(method=lm , color="red", fill="#69b3a2", se=TRUE)
-cor_coefs <- cor.test(data$PVol, data$TVol)
-
+data %>% 
+  filter(!is.na(sGS)) %>% 
+  ggplot(data, mapping = aes(x=as.factor(sGS), y=PVol))+
+  geom_boxplot(mapping = NULL, stat = "boxplot", position ="dodge2")
 ```
 
- 
+It seems that the distribution of PVol depends on the level SGS.Those in category 2 have the highest PVol mean*
+
+### plot Taraneh 
+
+Is there a relation between the PVol and TVol variables?
+
+```{r}
+
+
+library(ggplot2) 
+library(hrbrthemes)
+
+#Scatter plot with linear trend 
+
+ggplot(data, aes(x=PVol, y=TVol)) + 
+  geom_point() +
+  geom_smooth(method=lm , color="red", se=FALSE) +
+  theme_ipsum()
+
+# Correlation test
+
+cor_coefs <- cor.test(data$PVol, data$TVol)
+cor_coefs
+```
+
+ Answer: p-value=0.0002217 < 0.05 --> we can conclude that PVol and TVol are significantly correlated with correlation coefficient = -0.21
+
  
  
 ## Day 8 Analysis 
@@ -309,8 +335,59 @@ Answer to the question: since the p value for Anova is higher than
 0.05 it is not possible to reject the null hypothesis and
 and we cannot claim that the time to recurrence varied by RBC age group 
 
+
 ### Analysis Carol
+Did having AdjRadTherapy affected time to recurrence?
+
+```{r}
+Anyadjtherapy_recurrence <-data %>%
+  filter(!is.na(TimeToRecurrence_days)) %>%
+  ggplot(data, mapping = aes(x=as.factor(AdjRadTherapy), y=TimeToRecurrence_days))+
+  geom_boxplot(mapping = NULL, stat = "boxplot", position ="dodge2")
+
+Anyadjtherapy_recurrence 
+
+data %>% 
+  mutate(TimeToRecurrence_days = log(TimeToRecurrence_days)) %>%
+  aov(TimeToRecurrence_days~AdjRadTherapy, data = .) %>% 
+  broom::tidy()
+
+```
 
 
-### Analysis Taraneh 
+Boxplot showing AdjRadtheory vs recurrence
+Results: This relationship is unclear because the there are very few 1's in the anyadjtherapy recurrence.
+However the mean is higher in those with 0's
+The p value value is 0.592.
+
+### Analysis Taraneh
+
+Did those that had recurrence had also larger TVol values than those without recurrence?
+Here we see at TVol for those with (1) and without recurrence (0):
+
+```{r}
+# First we need to load the required packages: 
+library(tidyverse)
+library(medicaldata)
+library(ggpubr)
+library(rstatix)
+
+# Before performing any statistical test, we need to find out whether if the variables are normally distributed or not: 
+
+data %>%
+  group_by(Recurrence) %>%
+  shapiro_test(TVol)
+
+# Output p-value << 0.05 --> We cannot assume the normality, so we need to use non-parametric test (Kruskalwallis): 
+
+data %>% 
+  kruskal.test(TVol~Recurrence, data = .) %>%
+  broom::tidy()
+```
+
+
+Answer: Output p-value = 0.000000367 << 0.05, i.e. we have a significant p-value. It is possible to reject the null hypothesis. Thus, we can claim that the TVol is different for those with recurrence vs without recurrence.
+
+
+
 
