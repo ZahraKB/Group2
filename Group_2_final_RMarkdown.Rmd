@@ -1,5 +1,5 @@
 ---
-title: "Group_2_RMED901-R"
+title: "Group_2_RMED901"
 author: "Group 2 members"
 date: "`r Sys.Date()`"
 output: html_document
